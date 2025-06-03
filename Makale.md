@@ -15,15 +15,15 @@ GUI bileşenlerimizi
 
 adım adım anlatacağım. Ayrıca, karşılaştığım zorluklar ve çözümleri de paylaşacağım.
 
-1. Programlama Dili ve Gramer Seçimi
-1.1 Neden Java ve Swing?
+## 1. Programlama Dili ve Gramer Seçimi
+## 1.1 Neden Java ve Swing?
 Swing Kütüphanesi: Java’nın standart GUI aracı Swing, JTextPane ve StyledDocument sayesinde her karakter aralığına istediğimiz stili (renk, yazı tipi, altı çizili vb.) kolaylıkla uygulamamıza imkân veriyor. Özellikle underline (altı çizili) vurgulama gibi özellikleri manuel tanımlamak Swing’de çok elverişli.
 
 Platform Bağımsızlığı: Java ile oluşturulan JAR dosyası, Windows, macOS veya Linux fark etmeksizin çalışabiliyor.
 
 Regex İmkanı: java.util.regex paketi, hem güçlü hem de kolay biçimde “master-regex” (tek bir düzenli ifade) kullanmamıza izin veriyor. Bu sayede token çakışmalarını daha minimal kodla çözebildik.
 
-1.2 Desteklenen Gramer
+## 1.2 Desteklenen Gramer
 Projenin hedefi, bir C/Java altkümesi (subset) sokmak ve en temel üç yapıyı gerçek zamanlı parse edip renklendirmek:
 
 Değişken Tanımlama
@@ -63,8 +63,8 @@ Burada yalnızca karşılaştırma operatörleri (>, <) destekleniyor. Blok içi
 
 Bu gramer, örneğin while, else, for, return vb. yapıları içermiyor. İleride ihtiyaca göre eklenebilir, ama final projesi için yukarıdaki üç yapı yeterli sayıldı.
 
-2. Leksik (Lexical) Analiz
-2.1 Master-Regex Yaklaşımı
+## 2. Leksik (Lexical) Analiz
+## 2.1 Master-Regex Yaklaşımı
 Amaç: Girdi metninden en küçük anlamsal birimleri (lexemleri) çıkarıp, her birini Token nesnesine dönüştürmek.
 
 Java’da birden çok token tipini tek bir regex içinde “named-group” olarak topladık:
@@ -96,7 +96,7 @@ IDENTIFIER: \b[a-zA-Z_][a-zA-Z0-9_]*\b
 
 Bu sayede “int” birden fazla gruba (KEYWORD, IDENTIFIER) uysa bile, regex’te ilk sırada olduğu için KEYWORD olarak yakalanır. Böylece token çakışması sorunu ortadan kalkar.
 
-2.2 Token Sınıfı
+## 2.2 Token Sınıfı
 java
 Kopyala
 Düzenle
@@ -120,7 +120,7 @@ start → metin içindeki ilk karakterin indeksi
 
 end → metin içindeki son karakterin indeksi (exclusive)
 
-2.3 tokenize( ) Metodu
+## 2.3 tokenize( ) Metodu
 Her karakter dizisinde:
 
 Matcher m = MASTER_PATTERN.matcher(text);
@@ -137,8 +137,8 @@ Elde edilen List<Token> döndürülür.
 
 Bu sayede girdi tümüyle taranır ve token dizisi elde edilir. Ardından, parser bu token dizisi üzerinden sözdizimi denetimini yapar.
 
-3. Parser (Sözdizimi Analizörü)
-3.1. Genel Yapı
+## 3. Parser (Sözdizimi Analizörü)
+## 3.1. Genel Yapı
 Elle yazılmış, top-down bir parser kullanıyoruz. “Recursive descent” değil, ama mantık olarak kural-kural ilerleyen bir yapı mevcut. Pseudocode:
 
 csharp
@@ -175,7 +175,7 @@ Eksik veya yanlışsa, Parser.errorStart = oToken.start; errorEnd = oToken.end; 
 
 Eğer kural uyuyorsa i += kaç token deyip sonraki ifadeye geç.
 
-3.2. Hata Tespiti: errorStart / errorEnd
+## 3.2. Hata Tespiti: errorStart / errorEnd
 errorStart ve errorEnd: Hatalı veya eksik token’ın start/end indekslerini saklar.
 
 Örnek: “int 2 = 5;” yazıldığında:
@@ -200,7 +200,7 @@ return false; → Parser sonlanır.
 
 Aynı yaklaşım, “kapanan ‘}’ eksik” gibi durumlarda önceki token ({) üzerine hata vurgusu yaparak kullanıcının nerede hata yaptığını kesin biçimde göstermemizi sağlıyor.
 
-3.3. Detaylı Kod Örneği
+## 3.3. Detaylı Kod Örneği
 java
 Kopyala
 Düzenle
@@ -486,8 +486,8 @@ public static boolean parse(List<Lexer.Token> tokens, String fullText) {
 private static String getTokenText(Lexer.Token token, String fullText) {
     return fullText.substring(token.start, token.end);
 }
-4. Gerçek-Zamanlı Renklendirme (Highlighting) Şeması
-4.1. Stil (Color) Tanımları
+## 4. Gerçek-Zamanlı Renklendirme (Highlighting) Şeması
+## 4.1. Stil (Color) Tanımları
 SyntaxHighlighterGUI içinde, JTextPane’in StyledDocument nesnesine şu stilleri ekledik:
 
 java
@@ -539,7 +539,7 @@ IDENTIFIER/SEPARATOR için siyah,
 
 ERROR için kırmızı + altı çizili
 
-4.2. Metni Renklendirme (highlight)
+## 4.2. Metni Renklendirme (highlight)
 java
 Kopyala
 Düzenle
@@ -585,7 +585,7 @@ Lexer.tokenize(text) çağrısıyla elde edilen token listesi üzerinde dönül�
 
 Parser.parse(...) çağrısı sonucu hata varsa, errorStart/errorEnd üzerinden “ERROR” stili (kırmızı altı çizili) uygulanır.
 
-4.3. Performans Optimizasyonu: DocumentListener + Timer
+## 4.3. Performans Optimizasyonu: DocumentListener + Timer
 java
 Kopyala
 Düzenle
@@ -608,7 +608,7 @@ Eğer kullanıcı çok hızlı yazıyorsa, Timer her tuştan sonra yeniden başl
 
 Bu sayede GUI kitlenmesi engellenir ve CPU yükü azalır.
 
-5. GUI (Grafiksel Kullanıcı Arayüzü) Uygulaması
+## 5. GUI (Grafiksel Kullanıcı Arayüzü) Uygulaması
 Aşağıda, en baştan sona küçültülmüş ama işlevsel bir Swing tabanlı GUI akışını görebilirsiniz:
 
 java
@@ -738,8 +738,8 @@ Lexer’dan dönen token listesine göre renk uygular.
 
 Parser’dan dönen Boolean’a (hata/geçerli) göre altı çizili vurguyu ekler.
 
-6. Karşılaşılan Zorluklar ve Çözümler
-6.1. Token Çakışmaları
+## 6. Karşılaşılan Zorluklar ve Çözümler
+## 6.1. Token Çakışmaları
 Sorun: “int” hem KEYWORD hem IDENTIFIER’a uyabilirdi. Eğer önce IDENTIFIER kontrol etseydik, “int” yanlışlıkla tanımlayıcı olarak algılanabilirdi.
 Çözüm:
 
@@ -747,7 +747,7 @@ Named-group düzenli ifadesinde <KEYWORD>’ü en üst sıraya aldık.
 
 Bu sayede “int” gördüğünde önce KEYWORD grubuna eşleşir; IDENTIFIER grubuna düşmez.
 
-6.2. IndexOutOfBoundsException Hataları
+## 6.2. IndexOutOfBoundsException Hataları
 Sorun: Parser’da tokens.get(i + k) ifadeleri, yazı kısmen girildiğinde sık sık Index out of bounds hatası veriyordu.
 Çözüm:
 
@@ -755,7 +755,7 @@ Her tokens.get(i + k) çağrısının önüne if (i+k >= tokens.size()) { … ha
 
 Eğer eksik token varsa (örneğin “int x = 5” yazılmış ama ; girilmemiş), hatayı bir önceki token (sayı “5”) üzerine atadık. Böylece GUI, “5” karakterinin altında kırmızı altı çizili gösterildi.
 
-6.3. Gerçek-Zamanlı Renklendirme Performansı
+## 6.3. Gerçek-Zamanlı Renklendirme Performansı
 Sorun: Kullanıcı hızlı yazarken her karakter girişinde highlight()’ı doğrudan çağırmak, GUI’yi kilitliyor (lag).
 Çözüm:
 
@@ -765,7 +765,7 @@ DocumentListener ile her insertUpdate/removeUpdate/changedUpdate’de timer.rest
 
 Bu sayede CPU yükü azalıyor ve kullanıcı deneyimi akıcı oluyor.
 
-6.4. Hatalı Token Konumlandırma
+## 6.4. Hatalı Token Konumlandırma
 Sorun: “noktalı virgül eksik” veya “kapanan süslü parantez eksik” durumlarında, önce hatayı fullText.length() (metnin sonuna) atadığımızda ekranda hiçbir karakter altı çizili görünmüyor, çünkü “metnin sonu” boş karakter demek.
 Çözüm:
 
@@ -773,7 +773,7 @@ Noktalı virgül eksikse, hatayı “bir önceki token” (sayı token’ı) üz
 
 Kapanan parantez eksikse, hatayı “açan {” karakteri üzerine attık. Böylece kullanıcı nerede süslü parantezi kapatması gerektiğini anında görebildi.
 
-6.5. Atama Çeşitliliği: “x = +6;” ve “x = 6;”
+## 6.5. Atama Çeşitliliği: “x = +6;” ve “x = 6;”
 Sorun: Başlangıçta parser yalnızca “x = x + 6;” biçimini kabul ediyordu. “x = +6;” veya “x = 6;” gibi tek token-atama ifadeleri hata veriyordu.
 Çözüm:
 
@@ -787,8 +787,8 @@ Atama kuralını üç alt duruma böldük:
 
 Kodda her bir alt kural için ayrı kontrol yaptık. Gerektiğinde i += 6, i += 5 veya i += 4 adımlarıyla döngüyü sürdürüyoruz. Böylece unary operatör içeren veya işaretsiz sayı ataması olan satırlar da “geçerli” kabul ediliyor.
 
-7. Sonuç ve Gelecek Geliştirmeler
-7.1. Proje Sonucu
+## 7. Sonuç ve Gelecek Geliştirmeler
+## 7.1. Proje Sonucu
 Bu proje sayesinde:
 
 Leksiksel analiz aşamasında 6 farklı token (KEYWORD, NUMBER, OPERATOR, PAREN, SEPARATOR, IDENTIFIER) başarıyla ayrıştırıldı.
@@ -803,7 +803,7 @@ GUI kısmında JTextPane + StyledDocument ile renklendirme, hatalı aralıkta al
 
 Bu adımlar, ödevin source code ve documentation gereksinimlerini eksiksiz karşıladı. Buna ek olarak, demo makale ve demo video ile proje halka açıklandı.
 
-7.2. Gelecek Geliştirmeler ve İyileştirmeler
+## 7.2. Gelecek Geliştirmeler ve İyileştirmeler
 Yeni Token Tipleri ve Anahtar Kelimeler
 
 else, while, for, return gibi ek keyword’ler eklenebilir.
@@ -854,10 +854,10 @@ Koyu tema / açık tema seçeneği, renk paletini dinamik olarak değiştirme ol
 
 Bu eklemeler, temel projenin sunduğu altyapıyı daha güçlü ve “gerçek bir IDE” hissi veren bir ortama dönüştürecektir.
 
-8. Kısa Kod Parçacığı Örnekleri
+## 8. Kısa Kod Parçacığı Örnekleri
 Aşağıda, projenin en kritik kısımlarından bazı küçük kod parçacıkları yer alıyor. Bunları makalenin ilerleyen noktalarında örnek olarak gösterebilirsiniz.
 
-8.1. Master-Regex Tanımı
+## 8.1. Master-Regex Tanımı
 java
 Kopyala
 Düzenle
@@ -873,7 +873,7 @@ private static final Pattern MASTER_PATTERN = Pattern.compile(
 
 “int” → KEYWORD, “123” → NUMBER, “(” → PAREN, “;” → SEPARATOR, vb.
 
-8.2. Token Sınıfı
+## 8.2. Token Sınıfı
 java
 Kopyala
 Düzenle
@@ -886,7 +886,7 @@ public static class Token {
         this.type = type; this.start = start; this.end = end;
     }
 }
-8.3. Leksik Analizci (tokenize)
+## 8.3. Leksik Analizci (tokenize)
 java
 Kopyala
 Düzenle
@@ -910,7 +910,7 @@ public static List<Token> tokenize(String text) {
     }
     return tokens;
 }
-8.4. Parser’ın Kısmî Atama Kuralı (3B: unary atama)
+## 8.4. Parser’ın Kısmî Atama Kuralı (3B: unary atama)
 java
 Kopyala
 Düzenle
@@ -946,7 +946,7 @@ else if (i+2 < tokens.size()
     i += 5; // Bu atama ifadesi toplam 5 token uzunluğunda
     continue;
 }
-8.5. Gerçek-Zamanlı Highlight Metodu
+## 8.5. Gerçek-Zamanlı Highlight Metodu
 java
 Kopyala
 Düzenle
@@ -982,7 +982,7 @@ private void highlight() {
         }
     }
 }
-9. Demo ve Beni Bekleyen Adımlar
+## 9. Demo ve Beni Bekleyen Adımlar
 Bu makale, Medium, GitHub Pages veya kişisel blog gibi herkese açık bir platforma yüklenecek.
 
 Video ile, aşağıdaki örnekleri ekran paylaşımı üzerinden göstereceğim:
@@ -1003,7 +1003,7 @@ Video ile, aşağıdaki örnekleri ekran paylaşımı üzerinden göstereceğim:
 
 Bu demo video, YouTube’a yüklenerek linki ilgili öğretim üyesine iletilecek.
 
-10. Sonuç
+## 10. Sonuç
 “Real-Time Grammar-Based Syntax Highlighter with GUI” projesi, adres bazlı altı çizili (underline) hata vurgusu ve gerçek zamanlı renkli sözdizimi sunan bir temel kod editö (mini-IDE) işlevi görüyor. Java’nın Swing ve Regex imkânları sayesinde:
 
 Leksiksel analiz hızlı ve doğru biçimde yapıldı.
